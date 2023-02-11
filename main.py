@@ -1,4 +1,4 @@
-from selenium.webdriver import Firefox, DesiredCapabilities
+from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.by import By
 
@@ -92,8 +92,6 @@ class FirefoxDriver:
                 self.driver.switch_to.window(w)
                 break
         
-        # self.driver.maximize_window()
-
         self.driver.implicitly_wait(25)
         self.driver.find_element(
             By.XPATH,
@@ -133,9 +131,50 @@ class FirefoxDriver:
         running = True
         while running:
             try:
-                time.sleep(1)
                 imgButton = pyautogui.locateCenterOnScreen("images/program/followButton1.png", confidence=0.7)  # type: ignore
                 pyautogui.click(imgButton.x, imgButton.y)
+                running = False
+            except:
+                continue
+        time.sleep(.7)
+        current_tab = self.driver.current_window_handle
+        chwd = self.driver.window_handles
+
+        self.driver.close()
+
+        for w in chwd:
+            if (w != current_tab):
+                self.driver.switch_to.window(w)
+                break
+
+    def open_twitter(self):
+        running = True
+        while running:
+            try:
+                twitterImg = pyautogui.locateCenterOnScreen("images/program/twitter.png", confidence=0.7)  # type: ignore
+                pyautogui.click(twitterImg.x, twitterImg.y + 8)
+                running = False
+            except:
+                continue
+
+        time.sleep(.4)
+        # get current window handle
+        current_tab = self.driver.current_window_handle
+        # get first child window
+        chwd = self.driver.window_handles
+
+        for w in chwd:
+            # switch focus to child window
+            if (w != current_tab):
+                self.driver.switch_to.window(w)
+                break
+
+    def confirm_follow(self) -> None:
+        running = True
+        while running:
+            try:
+                confirmButtonImg = pyautogui.locateCenterOnScreen("images/program/confirmFollow.png", confidence=0.7)  # type: ignore
+                pyautogui.click(confirmButtonImg.x, confirmButtonImg.y)
                 running = False
             except:
                 continue
@@ -167,15 +206,12 @@ class FirefoxDriver:
 
         self.login_twitter()
         self.follow()
+        self.confirm_follow()
 
-        # confirm that you followed
-        
-        # self.driver.implicitly_wait(8)
-        # self.driver.find_element(
-            # By.XPATH,
-            # "/html/body/div[6]/div/div[1]/div[2]/div[2]/div[4]/div[1]/div[2]/div[1]/div/div[1]/a"
-        # ).click()
-
+        while True:
+            self.open_twitter()
+            self.follow()
+            self.confirm_follow()
 
 if __name__ == "__main__":
     driver = FirefoxDriver()
